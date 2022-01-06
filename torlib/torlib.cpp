@@ -77,7 +77,7 @@ bool TorLib::Receive(string& buff, const int timeout)
 	buff = data_result;
 	return true;
 }
-bool TorLib::Send(const string& path) //отправка данных в сеть
+bool TorLib::Send(const string& path)
 {
 	BOOST_LOG_TRIVIAL(debug) << "TorLib::Send : " << path;
 	string req = (boost::format("GET %1% HTTP/1.0\r\nHost: %2%\r\n\r\n") % path % stream_host).str();	

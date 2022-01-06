@@ -33,7 +33,7 @@
 
 int main()
 {
-    setlocale(LC_CTYPE, "rus"); // вызов функции настройки локали
+    //setlocale(LC_CTYPE, "rus"); // set locale
     TorLib tlb;
     // track your own variable here
     //log::trivial::severity_level log_level = log::trivial::info;
