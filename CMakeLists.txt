@@ -11,7 +11,7 @@ add_library(tor-connect "tor-connect.cpp" "tor-connect.h" "torlib/torlib.cpp" "t
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
-find_package(Boost 1.69.0 COMPONENTS log REQUIRED)
+find_package(Boost 1.55 COMPONENTS log REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Boost_INCLUDE_DIRS}) 
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
