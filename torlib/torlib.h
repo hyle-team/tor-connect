@@ -34,6 +34,7 @@
 #include "NetConnect.h"
 #include "Util.h"
 #include "Cell.h"
+#include "tor_lib_iface.h"
 
 enum class link_specifier_type : u8
 {
@@ -43,7 +44,7 @@ enum class link_specifier_type : u8
 };
 
 
-class TorLib
+class TorLib: public tools::tor::t_tranport
 {
 private:	
 	bool GetConsensus();
@@ -97,10 +98,11 @@ private:
 
 public:
 	~TorLib();
-	bool Init(boost::log::trivial::severity_level log_level= boost::log::trivial::info);
-	int Connect(const string ip, const int port, const int timeout=0);
-	bool Close(); 
-	bool Send(const string& path);
-	bool Receive(string& buff, const int timeout=0);
+  // ------------- t_tranport ------------- 
+	virtual bool Init();
+  virtual int Connect(const string ip, const int port, const int timeout=0);
+  virtual bool Close();
+  virtual bool Send(const string& path);
+  virtual bool Receive(string& buff, const int timeout=0);
 };
 

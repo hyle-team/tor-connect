@@ -3,8 +3,9 @@
 #include "RelayCell.h"
 
 
-bool TorLib::Init(boost::log::trivial::severity_level log_level)
+bool TorLib::Init()
 {
+  boost::log::trivial::severity_level log_level = boost::log::trivial::info;
 	// with this filter
 	auto filt = boost::log::filter(boost::log::trivial::severity >= log_level);
 	boost::log::core::get()->set_filter(filt);
@@ -77,10 +78,10 @@ bool TorLib::Receive(string& buff, const int timeout)
 	buff = data_result;
 	return true;
 }
-bool TorLib::Send(const string& path)
+bool TorLib::Send(const string& req)
 {
-	BOOST_LOG_TRIVIAL(debug) << "TorLib::Send : " << path;
-	string req = (boost::format("GET %1% HTTP/1.0\r\nHost: %2%\r\n\r\n") % path % stream_host).str();	
+	//BOOST_LOG_TRIVIAL(debug) << "TorLib::Send : " << req;
+	//string req = (boost::format("GET %1% HTTP/1.0\r\nHost: %2%\r\n\r\n") % path % stream_host).str();	
 	bool ret_val = SendData(req, boost::bind(&TorLib::LogErr, this, pl::error));
 	if (ret_val) BOOST_LOG_TRIVIAL(info) << "Request sent, data received.";
 	return ret_val;
