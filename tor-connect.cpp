@@ -31,21 +31,64 @@
 
 #include "torlib/torlib.h"
 
+#include "epee/include/include_base_utils.h"
+#include "epee/include/net/levin_client.h"
+#include "epee/include/serialization/keyvalue_serialization.h"
+#include "epee/include/storages/portable_storage_template_helper.h"
+#include "torlib/tor_wrapper.h"
+
+namespace tools
+{
+  typedef epee::levin::levin_client_impl2<tools::tor::tor_transport> levin_over_tor_client;
+}
+
+struct NOTIFY_NEW_TRANSACTIONS
+{
+  const static int ID = 1001;
+
+  struct request
+  {
+    std::list<std::string>   txs;
+
+    BEGIN_KV_SERIALIZE_MAP()
+      KV_SERIALIZE(txs)
+    END_KV_SERIALIZE_MAP()
+  };
+};
+
+
 int main()
 {
-    //setlocale(LC_CTYPE, "rus"); // set locale
-    TorLib tlb;
-    // track your own variable here
-    //log::trivial::severity_level log_level = log::trivial::info;
-    tlb.Init();
-    int err_connect = tlb.Connect("ifconfig.me", 80, 0);
-    if (err_connect == 0)
-    {
-        tlb.Send("/");
-        string buff;
-        tlb.Receive(buff);
-        std::cout << "Data received :" << buff;
-    }        
-    else std::cout << "Error connect =" << err_connect;
-    tlb.Close();
+  epee::log_space::get_set_log_detalisation_level(true, LOG_LEVEL_0);
+  epee::log_space::get_set_need_thread_id(true, true);
+
+
+  epee::net_utils::levin_client2 p2p_client;
+  //tools::levin_over_tor_client p2p_client;
+  if (!p2p_client.connect("144.76.183.143", 1001, 100000))
+  {
+    LOG_ERROR("Failed to connect");
+    return 1;
+  }
+  NOTIFY_NEW_TRANSACTIONS::request p2p_req = AUTO_VAL_INIT(p2p_req);
+  std::string blob = "somebinarywillbehere";
+  epee::serialization::store_t_to_binary(p2p_req, blob);
+  p2p_client.notify(NOTIFY_NEW_TRANSACTIONS::ID, blob);
+  p2p_client.disconnect();
+  return 0;
+//     //setlocale(LC_CTYPE, "rus"); // set locale
+//     TorLib tlb;
+//     // track your own variable here
+//     //log::trivial::severity_level log_level = log::trivial::info;
+//     tlb.Init();
+//     int err_connect = tlb.Connect("ifconfig.me", 80, 0);
+//     if (err_connect == 0)
+//     {
+//         tlb.Send("/");
+//         string buff;
+//         tlb.Receive(buff);
+//         std::cout << "Data received :" << buff;
+//     }        
+//     else std::cout << "Error connect =" << err_connect;
+//     tlb.Close();
 }

@@ -5,7 +5,9 @@ project("tor-connect")
 #set(BOOST_ROOT "D:\\boost_1_72_0") # either set it here or from the command line  
 SET(Boost_USE_STATIC_LIBS ON)           # link statically
 
-add_library(tor-connect "tor-connect.cpp" "tor-connect.h" "torlib/torlib.cpp" "torlib/torlib.h" "torlib/Cell.cpp" "torlib/Cell.h" "torlib/Curve25519.cpp" "torlib/Curve25519.h" 
+include_directories(epee/include)
+
+add_executable(tor-connect "tor-connect.cpp" "tor-connect.h" "torlib/torlib.cpp" "torlib/torlib.h" "torlib/Cell.cpp" "torlib/Cell.h" "torlib/Curve25519.cpp" "torlib/Curve25519.h" 
 "torlib/NetConnect.cpp" "torlib/NetConnect.h" "torlib/OnionRouter.cpp" "torlib/OnionRouter.h" "torlib/Parser.cpp" "torlib/Parser.h" "torlib/RelayCell.cpp" "torlib/RelayCell.h" 
 "torlib/Util.cpp" "torlib/Util.h" "torlib/tor_wrapper.h" "torlib/tor_wrapper.cpp" "torlib/tor_lib_iface.h")
 
