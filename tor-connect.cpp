@@ -63,8 +63,8 @@ int main()
   epee::log_space::get_set_need_thread_id(true, true);
 
 
-  epee::net_utils::levin_client2 p2p_client;
-  //tools::levin_over_tor_client p2p_client;
+  //epee::net_utils::levin_client2 p2p_client;
+  tools::levin_over_tor_client p2p_client;
   if (!p2p_client.connect("144.76.183.143", 1001, 100000))
   {
     LOG_ERROR("Failed to connect");
