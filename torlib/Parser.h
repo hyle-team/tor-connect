@@ -99,12 +99,15 @@ private:
       "V2Dir",
     };
     const string directory_footer_control_words = "directory-footer";
+    const string accept_ports = "accept";
+    const string reject_ports = "reject";
+    bool PortSearch(string in_line, int port_search);
 public:
     vector<string> ParsString(const string& in_str, string del);
     tm GetValidUntil(const string& in_str);    
-    shared_ptr<OnionRouter> GetOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags);
+    shared_ptr<OnionRouter> GetOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags, int search_port = 0);
     bool SetOnionRouterKeys(shared_ptr<OnionRouter> onion_node, vector<string>& in_data);
-    vector<string> SearchOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags);
+    vector<string> SearchOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags, int search_port = 0);
     Parser();
 };
 

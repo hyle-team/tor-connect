@@ -68,6 +68,25 @@ std::tm Parser::GetValidUntil(const string& in_str)
 	}
 	return date;
 }
+bool Parser::PortSearch(string in_line, int port_search)
+{
+	if (port_search == 0) return true;
+	bool port_found = false;
+	vector<string> ports = ParsString(in_line, ",");
+	for (unsigned j = 0; j < ports.size() && !port_found; ++j)
+	{
+		if (ports[j].find("-") != std::string::npos)
+		{
+			vector<string> ports_d = ParsString(ports[j], "-");
+			if (ports_d.size() == 2)
+				port_found = std::stoi(ports_d[0]) <= port_search && port_search <= std::stoi(ports_d[1]);
+		}
+		else
+			port_found = std::stoi(ports[j]) == port_search;
+	}
+	return port_found;
+}
+
 bool Parser::SetOnionRouterKeys(shared_ptr<OnionRouter> onion_node, vector<string>& in_data)
 {
 	control_words current_location = control_words::not_determined;
@@ -102,51 +121,73 @@ bool Parser::SetOnionRouterKeys(shared_ptr<OnionRouter> onion_node, vector<strin
 	return true;
 }
 
-vector<string> Parser::SearchOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags)
+vector<string> Parser::SearchOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags, int search_port)
 {
 	int index;
 	if (random) index = Util::GetRandom() % in_data.size();
 	else index = 0;
 	vector<string> str_data;
 	if (in_data.size() < index) return str_data;
-	BOOST_LOG_TRIVIAL(debug) << "Search Onion Router ip=" << sh_ip << " or_port=" << or_port << " dir_port=" << dir_port;
+	BOOST_LOG_TRIVIAL(debug) << "Search Onion Router ip=" << sh_ip << " or_port=" << or_port << " dir_port=" << dir_port << " search_port =" << search_port;
 	do
-	{
+	{		
 		string line = in_data[index];
 		if (!line.empty() && line.length() > 2)
 		{
-			//string control_char = std::to_string(line[0] + line[1]);
 			string control_char;// = std::to_string(line[0]);
 			control_char.push_back(line[0]);
 			control_char.push_back(line[1]);
 			boost::trim(control_char);
 			if (control_char.length() == 1 && control_char[0] == static_cast<char>(entry_type::entry_r))
-			{
-				// Search parameters
-				bool dop_par = false;
-				for (int i = 0; i < 5 && !dop_par; ++i)
+			{				
+				BOOST_LOG_TRIVIAL(debug) << "Entry line:" << in_data[index];
+				unsigned int index_entry[] = { 0, 0 };
+				for (int i = 0; i < 7; ++i)
 				{
 					control_char.clear();
 					control_char.push_back(in_data[index + i][0]);
 					control_char.push_back(in_data[index + i][1]);
 					boost::trim(control_char);
+					if (control_char.length() == 1 && control_char[0] == static_cast<char>(entry_type::entry_p))
+						index_entry[0] = i;
 					if (control_char.length() == 1 && control_char[0] == static_cast<char>(entry_type::entry_s))
+						index_entry[1] = i;
+				}
+				// Search parameters
+				bool dop_par = true;
+				if (search_port > 0)
+				{
+					string search_line = in_data[index + index_entry[0]];
+					if (search_line.find(reject_ports) != std::string::npos)
 					{
-						dop_par = true;
-						for (unsigned j = 0; j < flags.size() && dop_par; ++j)
-						{
-							string s = in_data[index + i];
-							size_t pos = in_data[index + i].find(flags[j]);
-							dop_par = pos != std::string::npos;
-						}
+						search_line = search_line.substr(reject_ports.length() + 3, search_line.length() - reject_ports.length());
+						dop_par = !PortSearch(search_line, search_port);
+					}
+					else if (search_line.find(accept_ports) != std::string::npos)
+					{
+						search_line = search_line.substr(accept_ports.length() + 3, search_line.length() - accept_ports.length());
+						dop_par = PortSearch(search_line, search_port);
 					}
 				}
 				if (!dop_par)
 				{
+					BOOST_LOG_TRIVIAL(debug) << "Doesn't fit port:" << in_data[index + index_entry[0]];
 					++index;
 					continue;
-				}					
-				// Search by conditions 
+				}
+				for (unsigned j = 0; j < flags.size() && dop_par; ++j)
+				{
+					string s = in_data[index + index_entry[1]];
+					size_t pos = in_data[index + index_entry[1]].find(flags[j]);
+					dop_par = pos != std::string::npos;
+				}
+				if (!dop_par)
+				{
+					BOOST_LOG_TRIVIAL(debug) << "Doesn't fit parametrs:" << in_data[index + index_entry[1]];
+					++index;
+					continue;
+				}
+				// Search by conditions 				
 				str_data = ParsString(line, " ");
 				if (str_data.size() > 1)
 				{
@@ -164,6 +205,10 @@ vector<string> Parser::SearchOnionRouter(vector<string>& in_data, bool random, i
 						BOOST_LOG_TRIVIAL(debug) << "----------------------------------------------------------------";
 						return str_data;
 					}
+					else
+					{
+						BOOST_LOG_TRIVIAL(debug) << "Doesn't fit conditions:" << line;
+					}
 				}
 			}
 		}
@@ -171,7 +216,8 @@ vector<string> Parser::SearchOnionRouter(vector<string>& in_data, bool random, i
 	} while (in_data.size() > index);
 	return str_data;
 }
-shared_ptr<OnionRouter> Parser::GetOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags)
+
+shared_ptr<OnionRouter> Parser::GetOnionRouter(vector<string>& in_data, bool random, int or_port, int dir_port, string sh_ip, vector<string> flags, int search_port)
 {
 	shared_ptr<OnionRouter> retOn = make_shared<OnionRouter>();
 	vector<string> data_node;
