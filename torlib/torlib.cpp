@@ -57,7 +57,7 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 	// Node 2
 	BOOST_LOG_TRIVIAL(info) << "Connect to Node 2 ...";
 	// Connect To Node
-	if (!ConnectToNode(2)) return 6;
+	if (!ConnectToNode(2, port)) return 6;	
 	// Get keys	
 	if (!GetKeysNode(2)) return 7;
 
@@ -176,7 +176,7 @@ void TorLib::CreateStreamComplete(int n_node, ConnectFunction connectFunc,
 	net::post(net::detail::bind_handler(connectFunc, err));	
 }
 
-bool TorLib::ConnectToNode(int n_node)
+bool TorLib::ConnectToNode(int n_node, int search_port)
 {
 	if (n_node == 1)
 	{
@@ -205,7 +205,7 @@ bool TorLib::ConnectToNode(int n_node)
 	if (n_node == 2)
 	{		
 		BOOST_LOG_TRIVIAL(debug) << "TorLib::ConnectToNode 2";
-		onion_routers[n_node] = parser.GetOnionRouter(data_consensus, true, 0, 0, "", { "Exit", "Fast","Running", "Valid" });
+		onion_routers[n_node] = parser.GetOnionRouter(data_consensus, true, 0, 0, "", { "Exit", "Fast","Running", "Valid" }, search_port);
 		if (onion_routers[n_node]->nickname.length() == 0)
 		{
 			BOOST_LOG_TRIVIAL(debug) << "Onion Router not found";

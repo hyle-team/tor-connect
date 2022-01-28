@@ -50,7 +50,7 @@ private:
 	bool GetConsensus();
 	bool GetKeysNode(int n_node);
 
-	bool ConnectToNode(int n_node);
+        bool ConnectToNode(int n_node, int search_port = 0);
 
 	//int connection_handle;
 	vector<tuple<string, string, int, int>> DA;
