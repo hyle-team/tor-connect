@@ -3,9 +3,8 @@
 #include "RelayCell.h"
 
 
-bool TorLib::Init()
+bool TorLib::Init(log_lv log_level)
 {
-  boost::log::trivial::severity_level log_level = boost::log::trivial::info;
 	// with this filter
 	auto filt = boost::log::filter(boost::log::trivial::severity >= log_level);
 	boost::log::core::get()->set_filter(filt);
@@ -35,7 +34,11 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 	stream_port = port;
 	work = make_shared<net::io_service::work>(io_service);
 
-	//work(io_service);
+	if (timeout > 0)
+	{
+		dtimer = unique_ptr<net::deadline_timer>(new net::deadline_timer(io_service, sec(timeout)));
+		dtimer->async_wait(boost::bind(&TorLib::OnTimeout, this, pl::error));
+	}
 
 	error_last_operation = false;
 	BOOST_LOG_TRIVIAL(info) << "Retrieving the file consensus...";
@@ -73,10 +76,31 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 
 	return 0;
 }
-bool TorLib::Receive(string& buff, const int timeout)
+
+void TorLib::OnTimeout(const sys::error_code& err)
 {
+	if (!err && err != net::error::operation_aborted)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Time out.";
+		error_last_operation = true;
+		io_service.stop();
+	}
+}
+
+bool TorLib::Receive(string& buff, const int timeout)
+{	
+	operation_completed = false;
+	BOOST_LOG_TRIVIAL(debug) << "TorLib::Receive";
+	if (timeout > 0)
+	{
+		dtimer = unique_ptr<net::deadline_timer>(new net::deadline_timer(io_service, sec(timeout)));
+		dtimer->async_wait(boost::bind(&TorLib::OnTimeout, this, pl::error));
+	}
+	data_result = "";
+	ReadStreamOne(3, boost::bind(&TorLib::LogErr, this, pl::error));
+	while (!operation_completed) io_service.poll_one();
 	buff = data_result;
-	return true;
+	return !error_last_operation;
 }
 bool TorLib::Send(const string& req)
 {
@@ -94,10 +118,20 @@ bool TorLib::SendData(string reqest, ConnectFunction connectFunc)
 	circuit_node.Append(reqest);
 	onion_routers[3]->Encrypt(circuit_node);
 	onion_routers[2]->Encrypt(circuit_node, false);	
-	net_connect->WriteCell(circuit_node,
-		boost::bind(&TorLib::ReadStreamData, this, 3, connectFunc, pl::error));
+	//net_connect->WriteCell(circuit_node,
+	//	boost::bind(&TorLib::ReadStreamData, this, 3, connectFunc, pl::error));
+
+	net_connect->WriteCell(circuit_node, boost::bind(&TorLib::LogErr, this, pl::error));
+
 	while (!operation_completed) io_service.poll_one();
 	return !error_last_operation;
+}
+void TorLib::ReadStreamOne(int n_node, ConnectFunction connectFunc)
+{
+	BOOST_LOG_TRIVIAL(debug) << "TorLib::ReadStreamOne";
+	shared_ptr<Cell> node(new Cell());
+	net_connect->ReadCell(node, boost::bind(&TorLib::ReadStreamComplete,
+		this, n_node, connectFunc, node, pl::error));
 }
 void TorLib::ReadStreamData(int n_node, ConnectFunction connectFunc, const sys::error_code& err)
 {
