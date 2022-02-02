@@ -116,8 +116,9 @@ namespace pl = net::placeholders;
 namespace sys = boost::system;
 namespace ssl = boost::asio::ssl;
 namespace fs = boost::filesystem;
-//using log = boost::log; 
-
+using timer = boost::asio::steady_timer;
+using log_lv = boost::log::trivial::severity_level;
+using sec = boost::posix_time::seconds;
 
 
 using std::string;
