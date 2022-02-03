@@ -7,6 +7,11 @@ SET(Boost_USE_STATIC_LIBS ON)           # link statically
 
 include_directories(epee/include)
 
+if(MSVC)
+  add_definitions("/D_CRT_SECURE_NO_WARNINGS /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN")
+endif()
+
+
 add_executable(tor-connect "tor-connect.cpp" "tor-connect.h" "torlib/torlib.cpp" "torlib/torlib.h" "torlib/Cell.cpp" "torlib/Cell.h" "torlib/Curve25519.cpp" "torlib/Curve25519.h" 
 "torlib/NetConnect.cpp" "torlib/NetConnect.h" "torlib/OnionRouter.cpp" "torlib/OnionRouter.h" "torlib/Parser.cpp" "torlib/Parser.h" "torlib/RelayCell.cpp" "torlib/RelayCell.h" 
 "torlib/Util.cpp" "torlib/Util.h" "torlib/tor_wrapper.h" "torlib/tor_wrapper.cpp" "torlib/tor_lib_iface.h")

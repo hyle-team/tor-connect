@@ -70,12 +70,34 @@ int main()
     LOG_ERROR("Failed to connect");
     return 1;
   }
-  NOTIFY_NEW_TRANSACTIONS::request p2p_req = AUTO_VAL_INIT(p2p_req);
-  std::string blob = "somebinarywillbehere";
-  epee::serialization::store_t_to_binary(p2p_req, blob);
-  p2p_client.notify(NOTIFY_NEW_TRANSACTIONS::ID, blob);
-  p2p_client.disconnect();
-  return 0;
+
+  std::string buff1 = "123123123123sdfdcfs";
+  std::string buff2 = "jindkwjdniwjenwjnwkjnkjnkjn";
+
+
+  p2p_client.get_transport().send(buff1);
+  p2p_client.get_transport().send(buff2);
+
+  std::string buff_res;
+  if (!p2p_client.get_transport().recv_n(buff_res, buff1.size() + buff2.size()))
+  {
+    LOG_ERROR("Failed to recv given amount of data back");
+    return 0;
+  }
+
+
+  LOG_PRINT_L0("Successfully read");
+  return 1;
+
+
+
+
+//   NOTIFY_NEW_TRANSACTIONS::request p2p_req = AUTO_VAL_INIT(p2p_req);
+//   std::string blob = "somebinarywillbehere";
+//   epee::serialization::store_t_to_binary(p2p_req, blob);
+//   p2p_client.notify(NOTIFY_NEW_TRANSACTIONS::ID, blob);
+//   p2p_client.disconnect();
+//   return 0;
 //     //setlocale(LC_CTYPE, "rus"); // set locale
 //     TorLib tlb;
 //     // track your own variable here
