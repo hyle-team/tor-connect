@@ -62,31 +62,35 @@ int main()
   epee::log_space::get_set_log_detalisation_level(true, LOG_LEVEL_0);
   epee::log_space::get_set_need_thread_id(true, true);
 
+  while (true)
+  {
+    tools::levin_over_tor_client p2p_client;
+    if (!p2p_client.connect("144.76.183.143", 1001, 5000))
+    {
+      LOG_ERROR("Failed to connect");
+      return 1;
+    }
 
+    std::string buff1 = "123123123123sdfdcfs";
+    std::string buff2 = "jindkwjdniwjenwjnwkjnkjnkjn";
+
+
+    p2p_client.get_transport().send(buff1);
+    p2p_client.get_transport().send(buff2);
+
+    std::string buff_res;
+    if (!p2p_client.get_transport().recv_n(buff_res, buff1.size() + buff2.size()))
+    {
+      LOG_ERROR("Failed to recv given amount of data back");
+      p2p_client.disconnect();
+      continue;
+    }
+
+    p2p_client.disconnect();
+    LOG_PRINT_L0("Successfully read");
+  }
   //epee::net_utils::levin_client2 p2p_client;
-  tools::levin_over_tor_client p2p_client;
-  if (!p2p_client.connect("144.76.183.143", 1001, 100000))
-  {
-    LOG_ERROR("Failed to connect");
-    return 1;
-  }
 
-  std::string buff1 = "123123123123sdfdcfs";
-  std::string buff2 = "jindkwjdniwjenwjnwkjnkjnkjn";
-
-
-  p2p_client.get_transport().send(buff1);
-  p2p_client.get_transport().send(buff2);
-
-  std::string buff_res;
-  if (!p2p_client.get_transport().recv_n(buff_res, buff1.size() + buff2.size()))
-  {
-    LOG_ERROR("Failed to recv given amount of data back");
-    return 0;
-  }
-
-
-  LOG_PRINT_L0("Successfully read");
   return 1;
 
 
