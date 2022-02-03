@@ -222,7 +222,7 @@ shared_ptr<OnionRouter> Parser::GetOnionRouter(vector<string>& in_data, bool ran
 	shared_ptr<OnionRouter> retOn = make_shared<OnionRouter>();
 	vector<string> data_node;
 	for (int i = 0; i < 10 && data_node.size() == 0; ++i)
-		data_node = SearchOnionRouter(in_data, random, or_port, dir_port, sh_ip, flags);
+		data_node = SearchOnionRouter(in_data, random, or_port, dir_port, sh_ip, flags, search_port);
 	if (data_node.size() > 0)
 	{
 		//vector<string> str_data = ParsString(in_data[index], " ");
