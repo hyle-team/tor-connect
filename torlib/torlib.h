@@ -60,7 +60,7 @@ private:
 
 	net::io_service io_service;
 	shared_ptr<net::io_service::work> work;
-	//net::io_service::work work;
+	unique_ptr<net::deadline_timer> dtimer;
 	unique_ptr<NetConnect> net_connect;
 	bool operation_completed;
 	bool error_last_operation;
@@ -94,12 +94,13 @@ private:
 
 	bool SendData(string reqest, ConnectFunction connectFunc);
 	void ReadStreamData(int n_node, ConnectFunction connectFunc, const sys::error_code& err);
-	void ReadStreamComplete(int n_node, ConnectFunction connectFunc, shared_ptr<Cell> node, const sys::error_code& err);
-
+	void ReadStreamOne(int n_node, ConnectFunction connectFunc);		
+	void ReadStreamComplete(int n_node, ConnectFunction connectFunc, shared_ptr<Cell> node, const sys::error_code& err);	
+	void OnTimeout(const sys::error_code& err);
 public:
 	~TorLib();
   // ------------- t_tranport ------------- 
-	virtual bool Init();
+  virtual bool Init(log_lv log_level = boost::log::trivial::info);
   virtual int Connect(const string ip, const int port, const int timeout=0);
   virtual bool Close();
   virtual bool Send(const string& path);
