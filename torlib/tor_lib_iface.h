@@ -30,7 +30,7 @@
 */
 
 #pragma once 
-
+#include "util.h"
 
 namespace tools
 {
@@ -39,7 +39,7 @@ namespace tools
 
     struct t_tranport
     {
-      virtual bool Init(log_lv log_level) = 0;
+      virtual bool Init(log_lv log_level = boost::log::trivial::info) = 0;
       virtual int Connect(const std::string ip, const int port, const int timeout = 0) = 0;
       virtual bool Close() = 0;
       virtual bool Send(const std::string& buff) = 0;
