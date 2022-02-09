@@ -179,7 +179,7 @@ void TorLib::ReadStreamComplete(int n_node, ConnectFunction connectFunc,
 	BOOST_LOG_TRIVIAL(debug) << "-----------------------------------";
 
 	data_result.clear();
-	data_result.append(reinterpret_cast<char const*>(relay_node->GetPayload()), relay_node->GetPayloadSize());
+	data_result.append(reinterpret_cast<char const*>(relay_node->GetRelayPayload()), relay_node->GetRelayPayloadLength());
 
 	net::post(net::detail::bind_handler(connectFunc, err));
 }
