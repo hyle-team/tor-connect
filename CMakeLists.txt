@@ -12,9 +12,9 @@ if(MSVC)
 endif()
 
 
-add_executable(tor-connect "tor-connect.cpp" "tor-connect.h" "torlib/torlib.cpp" "torlib/torlib.h" "torlib/Cell.cpp" "torlib/Cell.h" "torlib/Curve25519.cpp" "torlib/Curve25519.h" 
-"torlib/NetConnect.cpp" "torlib/NetConnect.h" "torlib/OnionRouter.cpp" "torlib/OnionRouter.h" "torlib/Parser.cpp" "torlib/Parser.h" "torlib/RelayCell.cpp" "torlib/RelayCell.h" 
-"torlib/Util.cpp" "torlib/Util.h" "torlib/tor_wrapper.h" "torlib/tor_wrapper.cpp" "torlib/tor_lib_iface.h")
+file(GLOB_RECURSE TOR_LIB_FILES torlib/*.cpp torlib/*.h)    
+
+add_executable(tor-connect "tor-connect.cpp" "tor-connect.h" ${TOR_LIB_FILES} )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
