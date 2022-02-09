@@ -250,7 +250,7 @@ bool TorLib::ConnectToNode(int n_node, int search_port)
 			BOOST_LOG_TRIVIAL(debug) << "Onion Router not found";
 			return false;
 		}
-		BOOST_LOG_TRIVIAL(debug) << "Connecting to node " << n_node << ": '"
+		BOOST_LOG_TRIVIAL(info) << "Connecting to node " << n_node << ": '"
 			<< onion_routers[n_node]->nickname << "' (" << onion_routers[n_node]->ip << ":" << onion_routers[n_node]->or_port << ")";
 		net_connect->Connect(onion_routers[n_node]->ip, onion_routers[n_node]->or_port,
 			boost::bind(&TorLib::LogErr, this, pl::error));
@@ -267,6 +267,9 @@ bool TorLib::ConnectToNode(int n_node, int search_port)
 			BOOST_LOG_TRIVIAL(debug) << "Onion Router not found";
 			return false;
 		}
+
+    BOOST_LOG_TRIVIAL(info) << "Node 2: " << n_node << ": '"
+      << onion_routers[n_node]->nickname << "' (" << onion_routers[n_node]->ip << ":" << onion_routers[n_node]->or_port << ")";
 		return true;
 	}
 	BOOST_LOG_TRIVIAL(debug) << "TorLib::ConnectToNode Incorrect call parameters";
