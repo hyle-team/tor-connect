@@ -321,3 +321,8 @@ void NetConnect::HexDumpResponse()
 	unc* res_data = reinterpret_cast<unc*>(const_cast<char*>(data_str.c_str()));
 	Util::HexDump(res_data, data_str.length());
 }
+void NetConnect::ShutDown()
+{
+	BOOST_LOG_TRIVIAL(debug) << "NetConnect::ShutDown";
+	socket.shutdown(); 
+}

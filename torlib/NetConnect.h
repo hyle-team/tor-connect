@@ -79,6 +79,7 @@ public:
 	long GetEndpointLong();
 	void WriteCell(Cell& cell, ConnectFunction connectFunc);
 	void ReadCell(shared_ptr<Cell> cell, ConnectFunction connectFunc);	
+	void ShutDown();
 	~NetConnect();
 };
 
