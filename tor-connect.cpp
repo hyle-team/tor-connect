@@ -61,14 +61,16 @@ int main()
 {
   epee::log_space::get_set_log_detalisation_level(true, LOG_LEVEL_0);
   epee::log_space::get_set_need_thread_id(true, true);
+  epee::log_space::log_singletone::add_logger(LOGGER_CONSOLE, NULL, NULL);
+
 
   while (true)
   {
     tools::levin_over_tor_client p2p_client;
     if (!p2p_client.connect("144.76.183.143", 1001, 5000))
     {
-      LOG_ERROR("Failed to connect");
-      return 1;
+      LOG_PRINT_RED_L0("Failed to connect");
+      continue;;
     }
 
     std::string buff1 = "123123123123sdfdcfs";
@@ -87,7 +89,7 @@ int main()
     }
 
     p2p_client.disconnect();
-    LOG_PRINT_L0("Successfully read");
+    LOG_PRINT_GREEN_L0("Success interactions done, closing connection.");
   }
   //epee::net_utils::levin_client2 p2p_client;
 
