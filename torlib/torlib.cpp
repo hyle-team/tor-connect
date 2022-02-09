@@ -1,7 +1,7 @@
 #include "torlib.h"
 #include "Curve25519.h"
 #include "RelayCell.h"
-
+#include "HTTPClient.h"
 
 bool TorLib::Init(log_lv log_level)
 {
@@ -32,6 +32,7 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 	BOOST_LOG_TRIVIAL(info) << "Connect to "<< ip <<":"<< port;
 	stream_host = ip;
 	stream_port = port;
+	timeout_global = timeout;
 	work = make_shared<net::io_service::work>(io_service);
 
 	if (timeout > 0)
@@ -41,40 +42,53 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 	}
 
 	error_last_operation = false;
-	BOOST_LOG_TRIVIAL(info) << "Retrieving the file consensus...";
-	// Get Consensus
-	if(!GetConsensus()) return 1;
-	
-	// Node 1
-	BOOST_LOG_TRIVIAL(info) << "Connect to Node 1 ...";
-	// Connect To Node
-	if (!ConnectToNode(1)) return 2;
-	if(!SendNodeInfo(boost::bind(&TorLib::LogErr, this, pl::error))) return 3;
-	// Get keys	
-	if (!GetKeysNode(1)) return 4;
-	
-	if (!CreateNtor(1, boost::bind(&TorLib::LogErr, this, pl::error))) return 5;
+	int state_op = 1;
+	try
+	{
+		BOOST_LOG_TRIVIAL(info) << "Retrieving the file consensus...";
+		// Get Consensus
+		if (!GetConsensus()) return state_op;
 
-	BOOST_LOG_TRIVIAL(debug) << "Connect To Node 1 complite";
+		// Node 1
+		BOOST_LOG_TRIVIAL(info) << "Connect to Node 1 ...";
+		state_op = 2;
+		// Connect To Node
+		if (!ConnectToNode(1)) return state_op;
+		if (!SendNodeInfo(boost::bind(&TorLib::LogErr, this, pl::error))) return 3;
+		state_op = 4;
+		// Get keys	
+		if (!GetKeysNode(1)) return state_op;
 
-	// Node 2
-	BOOST_LOG_TRIVIAL(info) << "Connect to Node 2 ...";
-	// Connect To Node
-	if (!ConnectToNode(2, port)) return 6;	
-	// Get keys	
-	if (!GetKeysNode(2)) return 7;
+		if (!CreateNtor(1, boost::bind(&TorLib::LogErr, this, pl::error))) return 5;
 
-	if (!CreateExtendNtor(2, boost::bind(&TorLib::LogErr, this, pl::error))) return 8;
+		BOOST_LOG_TRIVIAL(debug) << "Connect To Node 1 complite";
 
-	BOOST_LOG_TRIVIAL(debug) << "Connect To Node 2 complite";
+		// Node 2
+		BOOST_LOG_TRIVIAL(info) << "Connect to Node 2 ...";
+		state_op = 6;
+		// Connect To Node
+		if (!ConnectToNode(2, port)) return state_op;
+		state_op = 7;
+		// Get keys	
+		if (!GetKeysNode(2)) return state_op;
+		state_op = 8;
+		if (!CreateExtendNtor(2, boost::bind(&TorLib::LogErr, this, pl::error))) return state_op;
 
-	BOOST_LOG_TRIVIAL(info) << "Create stream ...";
-	n_stream = 1;
-	if (!CreateStream(3, n_stream, ip, port, timeout, boost::bind(&TorLib::LogErr, this, pl::error))) return 9;
-	
-	BOOST_LOG_TRIVIAL(info) << "Connect completed.";	
+		BOOST_LOG_TRIVIAL(debug) << "Connect To Node 2 complite";
 
-	return 0;
+		BOOST_LOG_TRIVIAL(info) << "Create stream ...";
+		n_stream = 1;
+		state_op = 9;
+		if (!CreateStream(3, n_stream, ip, port, timeout, boost::bind(&TorLib::LogErr, this, pl::error))) return state_op;
+
+		BOOST_LOG_TRIVIAL(info) << "Connect completed.";
+		state_op = 0;
+	}
+	catch (...)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Unsuccessful connection to the Tor network.";
+	}	
+	return state_op;
 }
 
 void TorLib::OnTimeout(const sys::error_code& err)
@@ -84,6 +98,7 @@ void TorLib::OnTimeout(const sys::error_code& err)
 		BOOST_LOG_TRIVIAL(error) << "Time out.";
 		error_last_operation = true;
 		io_service.stop();
+		net_connect->ShutDown();
 	}
 }
 
@@ -97,8 +112,15 @@ bool TorLib::Receive(string& buff, const int timeout)
 		dtimer->async_wait(boost::bind(&TorLib::OnTimeout, this, pl::error));
 	}
 	data_result = "";
-	ReadStreamOne(3, boost::bind(&TorLib::LogErr, this, pl::error));
-	while (!operation_completed) io_service.poll_one();
+	try
+	{
+		ReadStreamOne(3, boost::bind(&TorLib::LogErr, this, pl::error));
+		while (!operation_completed) io_service.poll_one();
+	}
+	catch (...)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Unsuccessful read from Tor network.";
+	}
 	buff = data_result;
 	return !error_last_operation;
 }
@@ -272,7 +294,7 @@ bool TorLib::GetKeysNode(int n_node)
 	BOOST_LOG_TRIVIAL(debug) << "Get Keys from Node " << n_node << ": '"
 		<< data_node[static_cast<int>(entry_r_type::entry_r_nickname)] << "' ("	<< ip << ":"<< port << ")";
 	string target = "/tor/server/fp/" + onion_routers[n_node]->GetBase16EncodedIdentity(onion_routers[n_node]->identity);
-	data_result = GetDataFromUrl(ip, port, target);
+	data_result = GetDataFromUrlAsync(ip, port, target);
 	if (!data_result.empty())
 	{
 		BOOST_LOG_TRIVIAL(debug) << "TorLib::SetOnionRouterKeys";
@@ -298,7 +320,7 @@ bool TorLib::GetConsensus()
 	int rnd = 0;
 	sv_one = DA[rnd];
 	BOOST_LOG_TRIVIAL(debug) << "Connect to " << get<0>(sv_one) << ":" << get<3>(sv_one);
-	data_result = GetDataFromUrl(get<1>(sv_one), get<3>(sv_one), "/tor/status-vote/current/consensus");
+	data_result = GetDataFromUrlAsync(get<1>(sv_one), get<3>(sv_one), "/tor/status-vote/current/consensus");
 	if (data_result.empty())
 	{
 		BOOST_LOG_TRIVIAL(error) << "The file Consensus was not received!";
@@ -532,4 +554,13 @@ string TorLib::GetDataFromUrl(const string host, const int port, const string ta
 	std::string ret_str = boost::beast::buffers_to_string(res.body().data());
 
 	return ret_str;
+}
+string TorLib::GetDataFromUrlAsync(const string host, const int port, const string target)
+{
+	BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrlAsync " << host << ":" << port << " target=" << target;
+	net::io_context ioc;
+	shared_ptr<HTTPClient> client = make_shared<HTTPClient>(ioc);
+	client->RunClient(host.c_str(), port, target, timeout_global);
+	ioc.run();
+	return client->GetData();
 }
