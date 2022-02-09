@@ -101,7 +101,7 @@ unc* RelayCell::GetRelayPayload() {
 }
 
 int RelayCell::GetRelayPayloadLength() {
-    return IsRelayEnd() ? -1 : static_cast<int>(Util::BigEndianArrayToShort(GetBuffer() + RELAY_PAYLOAD_OFFSET));
+    return IsRelayEnd() ? -1 : static_cast<int>(Util::BigEndianArrayToShort(GetBuffer() + RELAY_PAYLOADSIZE_OFFSET));
 }
 
 unc RelayCell::GetRelayType() {
