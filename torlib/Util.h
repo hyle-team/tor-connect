@@ -35,13 +35,13 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
  
+#include <memory>
 #include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <locale>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
