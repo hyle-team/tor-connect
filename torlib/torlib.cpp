@@ -178,9 +178,8 @@ void TorLib::ReadStreamComplete(int n_node, ConnectFunction connectFunc,
 	Util::HexDump(relay_node->GetBuffer(), relay_node->GetBufferSize());
 	BOOST_LOG_TRIVIAL(debug) << "-----------------------------------";
 
-	data_result.clear();
-	data_result.append(reinterpret_cast<char const*>(relay_node->GetPayload()), relay_node->GetPayloadSize());
-
+	data_result.clear();	
+	data_result.append(reinterpret_cast<char const*>(relay_node->GetRelayPayload()), relay_node->GetRelayPayloadLength());
 	net::post(net::detail::bind_handler(connectFunc, err));
 }
 bool TorLib::CreateStream(int n_node, u16 id_stream, string host, int port, int timeout, ConnectFunction connectFunc)
