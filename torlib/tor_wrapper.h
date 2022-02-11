@@ -54,6 +54,9 @@ namespace tools
     private:
       std::shared_ptr<tools::tor::t_tranport> m_ptransport;
       bool m_is_connected;
+      bool m_is_initialized;
+      int m_recev_timeout;
+      std::string m_intermediate_buff;
     };
   }
 }

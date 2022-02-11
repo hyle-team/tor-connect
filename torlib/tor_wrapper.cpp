@@ -38,13 +38,24 @@ namespace tools
   namespace tor
   {
 
-    tor_transport::tor_transport() :m_is_connected(false), m_ptransport(new TorLib())
+    tor_transport::tor_transport() :m_is_connected(false), m_is_initialized(false), m_recev_timeout(0), m_ptransport(new TorLib())
     {
-      m_ptransport->Init();
+      
     }
 
-    bool tor_transport::connect(const std::string& ip, int port, int timeout, int /*recev_timeout*/, const std::string& /*bind_ip*/)
+    bool tor_transport::connect(const std::string& ip, int port, int timeout, int recev_timeout, const std::string& /*bind_ip*/)
     {
+      m_recev_timeout = recev_timeout;
+
+      if (!m_is_initialized)
+      {
+        if (!m_ptransport->Init())
+        {
+          return false;
+        }
+        m_is_initialized = true;
+      }
+
       int res = m_ptransport->Connect(ip, port, timeout);
       if (res == 0)
       {
@@ -74,8 +85,19 @@ namespace tools
 
     bool tor_transport::recv_n(std::string& buff, int64_t sz)
     {
-      //TODO
-      return false;
+      while (m_intermediate_buff.size() < sz)
+      {
+        std::string new_buff;
+        if (!m_ptransport->Receive(new_buff, m_recev_timeout))
+        {
+          return false;
+        }
+        m_intermediate_buff.append(new_buff);
+      }
+
+      buff = m_intermediate_buff.substr(0, sz);
+      m_intermediate_buff.erase(0, sz);
+      return true;
     }
 
   }
