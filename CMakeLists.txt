@@ -14,7 +14,7 @@ endif()
 
 file(GLOB_RECURSE TOR_LIB_FILES torlib/*.cpp torlib/*.h)    
 
-add_library(tor-connect "tor-connect.cpp" "tor-connect.h" ${TOR_LIB_FILES} )
+add_executable(tor-connect "tor-connect.cpp" "tor-connect.h" ${TOR_LIB_FILES} )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
