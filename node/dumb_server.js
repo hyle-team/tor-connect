@@ -19,7 +19,7 @@ server.on('connection', function(socket) {
 
     // Now that a TCP connection has been established, the server can send data to
     // the client by writing to its socket.
-    socket.write('Hello, client.');
+    //socket.write('Hello, client.');
 
     // The server can also receive data from the client by reading from its socket.
     socket.on('data', function(chunk) {

@@ -66,6 +66,7 @@ int main()
 
   while (true)
   {
+    //epee::net_utils::levin_client2 p2p_client;
     tools::levin_over_tor_client p2p_client;
     if (!p2p_client.connect("144.76.183.143", 1001, 5000))
     {
@@ -75,7 +76,7 @@ int main()
 
     std::string buff1 = "123123123123sdfdcfs";
     std::string buff2 = "jindkwjdniwjenwjnwkjnkjnkjn";
-
+    std::string buff_to_compare = buff1 + buff2;
 
     p2p_client.get_transport().send(buff1);
     p2p_client.get_transport().send(buff2);
@@ -84,6 +85,12 @@ int main()
     if (!p2p_client.get_transport().recv_n(buff_res, buff1.size() + buff2.size()))
     {
       LOG_ERROR("Failed to recv given amount of data back");
+      p2p_client.disconnect();
+      continue;
+    }
+    if (buff_res != buff_to_compare)
+    {
+      LOG_ERROR("Data is missmatching");
       p2p_client.disconnect();
       continue;
     }
