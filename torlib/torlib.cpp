@@ -129,7 +129,7 @@ bool TorLib::Send(const string& req)
 	//BOOST_LOG_TRIVIAL(debug) << "TorLib::Send : " << req;
 	//string req = (boost::format("GET %1% HTTP/1.0\r\nHost: %2%\r\n\r\n") % path % stream_host).str();	
 	bool ret_val = SendData(req, boost::bind(&TorLib::LogErr, this, pl::error));
-	if (ret_val) BOOST_LOG_TRIVIAL(info) << "Request sent, data received.";
+	if (ret_val) BOOST_LOG_TRIVIAL(info) << "Request sent.";
 	return ret_val;
 }
 bool TorLib::SendData(string reqest, ConnectFunction connectFunc)
@@ -138,6 +138,7 @@ bool TorLib::SendData(string reqest, ConnectFunction connectFunc)
 	BOOST_LOG_TRIVIAL(debug) << "TorLib::SendData reqest = " << reqest;
 	RelayCell circuit_node(circuit_id, n_stream, cell_command::relay, cell_command::relay_data);
 	circuit_node.Append(reqest);
+	if(!circuit_node.SetLengthRelayPayload(reqest.size())) return false;
 	onion_routers[3]->Encrypt(circuit_node);
 	onion_routers[2]->Encrypt(circuit_node, false);	
 	//net_connect->WriteCell(circuit_node,
