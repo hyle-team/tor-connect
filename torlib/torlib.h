@@ -93,7 +93,7 @@ private:
 
 	u32 circuit_id = 1;
 
-	bool SendData(string reqest, ConnectFunction connectFunc);
+	bool SendData(string reqest/* , ConnectFunction connectFunc*/);
 	void ReadStreamData(int n_node, ConnectFunction connectFunc, const sys::error_code& err);
 	void ReadStreamOne(int n_node, ConnectFunction connectFunc);		
 	void ReadStreamComplete(int n_node, ConnectFunction connectFunc, shared_ptr<Cell> node, const sys::error_code& err);	
