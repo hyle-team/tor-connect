@@ -65,7 +65,7 @@ public:
     int GetRelayPayloadLength();
     unc GetRelayType();
     bool IsRelayEnd();
-    void SetLengthRelayPayload();
+    bool SetLengthRelayPayload(u16 size_data);
     u16 GetStreamId();
 };
 

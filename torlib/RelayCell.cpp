@@ -80,12 +80,16 @@ void RelayCell::AppendData(u16 streamId, cell_command relay_command, int length)
     // Total 11 bytes
 }
 
-void RelayCell::SetLengthRelayPayload() {
-    u16 length = GetPayloadSize();
-    uint8_t d[2] = { 0 };
-    for (int i = 0; i < 2; ++i)
-        d[i] = (reinterpret_cast<u8*>(&length))[1 - i];
-    memcpy(GetBuffer() + RELAY_PAYLOAD_OFFSET, d, RELAY_BYTES_LEN);
+bool RelayCell::SetLengthRelayPayload(u16 size_data) {
+    if(size_data>117) 
+    {
+        BOOST_LOG_TRIVIAL(error) << "The length of the data is longer than the maximum length of the cell";
+        return false;
+    }        
+    unc len_payload[RELAY_BYTES_LEN];
+    Util::Int16ToArrayBigEndian(len_payload, size_data);
+    memcpy(GetBuffer() + RELAY_PAYLOAD_OFFSET, len_payload, RELAY_BYTES_LEN);
+    return true;
 }
 
 void RelayCell::SetDigest(unc* digest) {

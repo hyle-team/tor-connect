@@ -146,7 +146,7 @@ private:
  public:
   static void Int64ToArrayBigEndian(unc*a, u64 i);
   static void Int32ToArrayBigEndian(unc*a, u32 i);
-  static void Int16ToArrayBigEndian(unc*a, u32 i);
+  static void Int16ToArrayBigEndian(unc*a, u16 i);
   static uint16_t BigEndianArrayToShort(unc*buf);
   static uint32_t BigEndianArrayToInt(unc*buf);
   static void HexDump(unc* buf, int length);

@@ -65,7 +65,7 @@ void Util::Int32ToArrayBigEndian(unc* a, u32 i) {
 	a[3] = i & 0xFF;
 }
 
-void Util::Int16ToArrayBigEndian(unc* a, u32 i) {
+void Util::Int16ToArrayBigEndian(unc* a, u16 i) {
 	a[0] = (i >> 8) & 0xff;
 	a[1] = i & 0xff;
 }
