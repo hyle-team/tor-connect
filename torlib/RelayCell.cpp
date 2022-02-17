@@ -81,7 +81,7 @@ void RelayCell::AppendData(u16 streamId, cell_command relay_command, int length)
 }
 
 bool RelayCell::SetLengthRelayPayload(u16 size_data) {
-    if(size_data>117) 
+    if(size_data>TOR_MAX_CELL_PAYLOAD_DATA)
     {
         BOOST_LOG_TRIVIAL(error) << "The length of the data is longer than the maximum length of the cell";
         return false;

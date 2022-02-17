@@ -35,6 +35,8 @@
 #include "Cell.h"
 #include "Util.h"
 
+#define TOR_MAX_CELL_PAYLOAD_DATA 117
+
 #define DIGEST_OFFSET 10
 #define DIGEST_LENGTH 4
 #define RELAY_PAYLOAD_OFFSET 14
