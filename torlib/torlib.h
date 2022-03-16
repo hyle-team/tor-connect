@@ -50,7 +50,7 @@ private:
 	bool GetConsensus();
 	bool GetKeysNode(int n_node);
 
-        bool ConnectToNode(int n_node, int search_port = 0);
+  bool ConnectToNode(int n_node, int search_port = 0);
 
 	//int connection_handle;
 	vector<tuple<string, string, int, int>> DA;
@@ -63,8 +63,8 @@ private:
 	shared_ptr<net::io_service::work> work;
 	unique_ptr<net::deadline_timer> dtimer;
 	unique_ptr<NetConnect> net_connect;
-	bool operation_completed;
-	bool error_last_operation;
+	bool operation_completed = false;
+	bool error_last_operation = false;
 	map<int, shared_ptr<OnionRouter>> onion_routers;
 
 	bool SendNodeInfo(ConnectFunction connectFunc);
@@ -84,12 +84,13 @@ private:
 	void ReadStreamNode(int n_node, ConnectFunction connectFunc, const sys::error_code& err);
 	void CreateStreamComplete(int n_node, ConnectFunction connectFunc, shared_ptr<Cell> node, const sys::error_code& err);
 
-	string stream_host;
-	int stream_port;
-	int n_stream;
-        int timeout_global;
+	string stream_host = 0;
+	int stream_port = 0;
+	int n_stream = 0;
+  int timeout_global = 0;
 	vector<std::string> data_consensus;
 	string data_result;
+  uint64_t last_consensus_receive_time = 0;
 
 	u32 circuit_id = 1;
 
@@ -99,6 +100,7 @@ private:
 	void ReadStreamComplete(int n_node, ConnectFunction connectFunc, shared_ptr<Cell> node, const sys::error_code& err);	
 	void OnTimeout(const sys::error_code& err);
 public:
+  TorLib();
 	~TorLib();
   // ------------- t_tranport ------------- 
   virtual bool Init(log_lv log_level = boost::log::trivial::info);

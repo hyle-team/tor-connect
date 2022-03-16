@@ -368,7 +368,13 @@ bool TorLib::GetKeysNode(int n_node)
 
 bool TorLib::GetConsensus()
 {
-  BOOST_LOG_TRIVIAL(debug) << "TorLib::GetConsensus";
+  if (data_consensus.size() != 0 && epee::misc_utils:get_tick_count() - last_consensus_receive_time < 60)
+  {
+    BOOST_LOG_TRIVIAL(info) << "Reusing downloaded consensus";
+    return true;
+  }
+
+  BOOST_LOG_TRIVIAL(info) << "Downloading consensus...";
   tuple<string, string, int, int> sv_one;
   int count_try = 0;
   data_consensus.clear();
@@ -383,6 +389,7 @@ bool TorLib::GetConsensus()
     return false;
   }
   data_consensus = parser.ParsString(data_result, "\n");
+  last_consensus_receive_time = epee::misc_utils:get_tick_count();
   return data_consensus.size() != 0;
 }
 
@@ -394,6 +401,10 @@ void TorLib::LogErr(const sys::error_code& err)
     error_last_operation = true;
   }
   operation_completed = true;
+}
+
+TorLib::TorLib()
+{
 }
 
 TorLib::~TorLib()
