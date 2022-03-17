@@ -37,6 +37,12 @@ namespace tools
   namespace tor
   {
 
+    struct t_transport_state_notifier
+    {
+      virtual void notify_state_change(const std::string& state_code, const std::string& details = std::string()) {};
+    };
+
+
     struct t_tranport
     {
       virtual bool Init(boost::log::trivial::severity_level log_level = boost::log::trivial::info) = 0;
@@ -44,6 +50,24 @@ namespace tools
       virtual bool Close() = 0;
       virtual bool Send(const std::string& buff) = 0;
       virtual bool Receive(std::string& buff, const int timeout = 0) = 0;
+      virtual void SetNotifier(t_transport_state_notifier* pnotifier) = 0;
     };
+
   }
 }
+
+#define TOR_LIB_STATE_INITIALIZING                  "STATE_INITIALIZING"
+#define TOR_LIB_STATE_DOWNLOADING_CONSENSUS         "STATE_DOWNLOADING_CONSENSUS"
+#define TOR_LIB_STATE_MAKING_TUNNEL_A               "STATE_MAKING_TUNNEL_A"
+#define TOR_LIB_STATE_MAKING_TUNNEL_B               "STATE_MAKING_TUNNEL_B"
+#define TOR_LIB_STATE_CREATING_STREAM               "STATE_CREATING_STREAM"
+#define TOR_LIB_STATE_FAILED                        "STATE_FAILED"
+#define TOR_LIB_STATE_SUCCESS                       "STATE_SUCCESS"
+
+
+
+
+
+
+
+

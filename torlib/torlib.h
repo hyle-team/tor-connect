@@ -93,6 +93,8 @@ private:
   uint64_t last_consensus_receive_time = 0;
 
 	u32 circuit_id = 1;
+  tools::tor::t_transport_state_notifier notifier_dummy;
+  tools::tor::t_transport_state_notifier* pnotifier;
 
 	bool SendData(string reqest/* , ConnectFunction connectFunc*/);
 	void ReadStreamData(int n_node, ConnectFunction connectFunc, const sys::error_code& err);
@@ -108,5 +110,6 @@ public:
   virtual bool Close();
   virtual bool Send(const string& path);
   virtual bool Receive(string& buff, const int timeout=0);
+  virtual void SetNotifier(tools::tor::t_transport_state_notifier* pnotifier);
 };
 

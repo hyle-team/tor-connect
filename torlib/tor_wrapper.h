@@ -50,6 +50,7 @@ namespace tools
       bool send(const std::string& buff);
       bool recv_n(std::string& buff, int64_t sz);
       bool disconnect();
+      void set_notifier(tools::tor::t_transport_state_notifier* pn);
 
     private:
       std::shared_ptr<tools::tor::t_tranport> m_ptransport;

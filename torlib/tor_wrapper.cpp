@@ -100,5 +100,10 @@ namespace tools
       return true;
     }
 
+    void tor_transport::set_notifier(tools::tor::t_transport_state_notifier* pn);
+    {
+      m_ptransport->SetNotifier(pn);
+    }
+
   }
 }

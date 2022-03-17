@@ -62,6 +62,7 @@ bool TorLib::Init(log_lv log_level)
 
 int TorLib::Connect(const string ip, const int port, const int timeout)
 {
+  pnotifier->notify_state_change(TOR_LIB_STATE_INITIALIZING);
   BOOST_LOG_TRIVIAL(debug) << "TorLib::Connect";
   BOOST_LOG_TRIVIAL(info) << "Connect to " << ip << ":" << port;
   stream_host = ip;
@@ -79,10 +80,15 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
   int state_op = 1;
   try
   {
+    pnotifier->notify_state_change(TOR_LIB_STATE_DOWNLOADING_CONSENSUS);
     BOOST_LOG_TRIVIAL(info) << "Retrieving the file consensus...";
     // Get Consensus
-    if (!GetConsensus()) return state_op;
+    if (!GetConsensus()) 
+      return state_op;
 
+
+    
+    pnotifier->notify_state_change(TOR_LIB_STATE_MAKING_TUNNEL_A);
     // Node 1
     BOOST_LOG_TRIVIAL(info) << "Connect to Node 1 ...";
     state_op = 2;
@@ -95,8 +101,9 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 
     if (!CreateNtor(1, boost::bind(&TorLib::LogErr, this, pl::error))) return 5;
 
-    BOOST_LOG_TRIVIAL(debug) << "Connect To Node 1 complite";
+    BOOST_LOG_TRIVIAL(debug) << "Connect To Node 1 complete";
 
+    pnotifier->notify_state_change(TOR_LIB_STATE_MAKING_TUNNEL_B);
     // Node 2
     BOOST_LOG_TRIVIAL(info) << "Connect to Node 2 ...";
     state_op = 6;
@@ -108,8 +115,9 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
     state_op = 8;
     if (!CreateExtendNtor(2, boost::bind(&TorLib::LogErr, this, pl::error))) return state_op;
 
-    BOOST_LOG_TRIVIAL(debug) << "Connect To Node 2 complite";
+    BOOST_LOG_TRIVIAL(debug) << "Connect To Node 2 complete";
 
+    pnotifier->notify_state_change(TOR_LIB_STATE_CREATING_STREAM);
     BOOST_LOG_TRIVIAL(info) << "Create stream ...";
     n_stream = 1;
     state_op = 9;
@@ -117,10 +125,12 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 
     BOOST_LOG_TRIVIAL(info) << "Connect completed.";
     state_op = 0;
+    pnotifier->notify_state_change(TOR_LIB_STATE_SUCCESS);
   }
   catch (...)
   {
     BOOST_LOG_TRIVIAL(error) << "Unsuccessful connection to the Tor network.";
+    pnotifier->notify_state_change(TOR_LIB_STATE_FAILED);
   }
   return state_op;
 }
@@ -135,7 +145,10 @@ void TorLib::OnTimeout(const sys::error_code& err)
     net_connect->ShutDown();
   }
 }
-
+void TorLib::SetNotifier(tools::tor::t_transport_state_notifier* pn)
+{
+  pnotifier = pn;
+}
 bool TorLib::Receive(string& buff, const int timeout)
 {
   operation_completed = false;
@@ -368,7 +381,7 @@ bool TorLib::GetKeysNode(int n_node)
 
 bool TorLib::GetConsensus()
 {
-  if (data_consensus.size() != 0 && epee::misc_utils:get_tick_count() - last_consensus_receive_time < 60)
+  if (data_consensus.size() != 0 && time(nullptr) - last_consensus_receive_time < 60)
   {
     BOOST_LOG_TRIVIAL(info) << "Reusing downloaded consensus";
     return true;
@@ -389,7 +402,7 @@ bool TorLib::GetConsensus()
     return false;
   }
   data_consensus = parser.ParsString(data_result, "\n");
-  last_consensus_receive_time = epee::misc_utils:get_tick_count();
+  last_consensus_receive_time = time(nullptr);
   return data_consensus.size() != 0;
 }
 
@@ -403,7 +416,7 @@ void TorLib::LogErr(const sys::error_code& err)
   operation_completed = true;
 }
 
-TorLib::TorLib()
+TorLib::TorLib(): pnotifier(&notifier_dummy)
 {
 }
 
