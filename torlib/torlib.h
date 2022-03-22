@@ -84,7 +84,7 @@ private:
 	void ReadStreamNode(int n_node, ConnectFunction connectFunc, const sys::error_code& err);
 	void CreateStreamComplete(int n_node, ConnectFunction connectFunc, shared_ptr<Cell> node, const sys::error_code& err);
 
-	string stream_host = 0;
+	string stream_host;
 	int stream_port = 0;
 	int n_stream = 0;
   int timeout_global = 0;
