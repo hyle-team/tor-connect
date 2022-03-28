@@ -49,7 +49,7 @@ namespace tools
 
       if (!m_is_initialized)
       {
-        if (!m_ptransport->Init())
+        if (!m_ptransport->Init(boost::log::trivial::warning))
         {
           return false;
         }
