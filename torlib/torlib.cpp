@@ -72,7 +72,7 @@ int TorLib::Connect(const string ip, const int port, const int timeout)
 
   if (timeout > 0)
   {
-    dtimer = unique_ptr<net::deadline_timer>(new net::deadline_timer(io_service, sec(timeout)));
+    dtimer = unique_ptr<net::deadline_timer>(new net::deadline_timer(io_service, boost::posix_time::milliseconds(timeout)));
     dtimer->async_wait(boost::bind(&TorLib::OnTimeout, this, pl::error));
   }
 
@@ -155,7 +155,7 @@ bool TorLib::Receive(string& buff, const int timeout)
   BOOST_LOG_TRIVIAL(debug) << "TorLib::Receive";
   if (timeout > 0)
   {
-    dtimer = unique_ptr<net::deadline_timer>(new net::deadline_timer(io_service, sec(timeout)));
+    dtimer = unique_ptr<net::deadline_timer>(new net::deadline_timer(io_service, boost::posix_time::milliseconds(timeout)));
     dtimer->async_wait(boost::bind(&TorLib::OnTimeout, this, pl::error));
   }
   data_result = "";
