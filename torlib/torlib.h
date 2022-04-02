@@ -111,5 +111,7 @@ public:
   virtual bool Send(const string& path);
   virtual bool Receive(string& buff, const int timeout=0);
   virtual void SetNotifier(tools::tor::t_transport_state_notifier* pnotifier);
+  virtual void TransferExternalConsensus(std::vector<std::string>& local_consensus_data);
+  virtual void WithdrawExternalConsensus(std::vector<std::string>& local_consensus_data);
 };
 

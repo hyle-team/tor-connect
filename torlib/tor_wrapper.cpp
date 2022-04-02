@@ -38,13 +38,26 @@ namespace tools
   namespace tor
   {
 
-    tor_transport::tor_transport() :m_is_connected(false), m_is_initialized(false), m_recev_timeout(0), m_ptransport(new TorLib())
+    tor_transport::tor_transport() :m_is_connected(false), m_is_initialized(false), m_recev_timeout(0)
     {
       
     }
 
     bool tor_transport::connect(const std::string& ip, int port, int timeout, int recev_timeout, const std::string& /*bind_ip*/)
     {
+      if (m_ptransport.get())
+      {
+        std::vector<std::string> consensus;
+        m_ptransport->WithdrawExternalConsensus(consensus);
+        m_ptransport.reset(new TorLib());
+        m_ptransport->TransferExternalConsensus(consensus);
+      }
+      else
+      {
+        m_ptransport.reset(new TorLib());
+      }
+      m_ptransport->SetNotifier(m_pn);
+
       m_recev_timeout = recev_timeout;
 
       if (!m_is_initialized)
@@ -102,7 +115,7 @@ namespace tools
 
     void tor_transport::set_notifier(tools::tor::t_transport_state_notifier* pn)
     {
-      m_ptransport->SetNotifier(pn);
+      m_pn = pn;
     }
 
   }

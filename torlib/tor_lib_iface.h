@@ -30,6 +30,7 @@
 */
 
 #pragma once 
+#include <vector>
 #include <boost/log/trivial.hpp>
 
 namespace tools
@@ -51,6 +52,9 @@ namespace tools
       virtual bool Send(const std::string& buff) = 0;
       virtual bool Receive(std::string& buff, const int timeout = 0) = 0;
       virtual void SetNotifier(t_transport_state_notifier* pnotifier) = 0;
+      virtual void TransferExternalConsensus(std::vector<std::string>& local_consensus_data) = 0;
+      virtual void WithdrawExternalConsensus(std::vector<std::string>& local_consensus_data) = 0;
+
     };
 
   }

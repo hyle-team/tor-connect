@@ -149,6 +149,18 @@ void TorLib::SetNotifier(tools::tor::t_transport_state_notifier* pn)
 {
   pnotifier = pn;
 }
+void TorLib::TransferExternalConsensus(std::vector<std::string>& local_consensus_data)
+{
+  local_consensus_data.swap(data_consensus);
+  last_consensus_receive_time = time(nullptr);
+}
+
+void TorLib::WithdrawExternalConsensus(std::vector<std::string>& local_consensus_data)
+{
+  local_consensus_data.swap(data_consensus);
+  last_consensus_receive_time = time(nullptr);
+}
+
 bool TorLib::Receive(string& buff, const int timeout)
 {
   operation_completed = false;
