@@ -36,7 +36,7 @@
 #include "Curve25519.h"
 #include "RelayCell.h"
 //#include "HTTPClient.h"
-#include "net\http_client.h"
+#include "net/http_client.h"
 
 bool TorLib::Init(log_lv log_level)
 {
