@@ -35,7 +35,8 @@
 #include "torlib.h"
 #include "Curve25519.h"
 #include "RelayCell.h"
-#include "HTTPClient.h"
+//#include "HTTPClient.h"
+#include "net\http_client.h"
 
 bool TorLib::Init(log_lv log_level)
 {
@@ -579,50 +580,91 @@ bool TorLib::SendNodeInfo(ConnectFunction connectFunc)
 
 string TorLib::GetDataFromUrl(const string host, const int port, const string target)
 {
-  BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrl " << host << ":" << port << " target=" << target;
-  // The io_context is required for all I/O
-  net::io_context ioc;
-  // These objects perform our I/O
-  tcp::resolver resolver(ioc);
-  beast::tcp_stream stream(ioc);
-  // Look up the domain name
-  auto const results = resolver.resolve(host, std::to_string(port));
-  // Make the connection on the IP address we get from a lookup
-  stream.connect(results);
-  // Set up an HTTP GET request message
-  http::request<http::string_body> req{ http::verb::get, target, 11 };
-  req.set(http::field::host, host);
-  req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-  // Send the HTTP request to the remote host
-  //http::async_write();
-  http::write(stream, req);
-  // This buffer is used for reading and must be persisted
-  beast::flat_buffer buffer;
-  // Declare a container to hold the response
-  http::response<http::dynamic_body> res;
-  // Receive the HTTP response
-  http::read(stream, buffer, res);
-  // Gracefully close the socket
-  beast::error_code ec;
-  stream.socket().shutdown(tcp::socket::shutdown_both, ec);
-  // not_connected happens sometimes
-  // so don't bother reporting it.
-  //
-  if (ec && ec != beast::errc::not_connected)
+//   BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrl " << host << ":" << port << " target=" << target;
+//   // The io_context is required for all I/O
+//   net::io_context ioc;
+//   // These objects perform our I/O
+//   tcp::resolver resolver(ioc);
+//   beast::tcp_stream stream(ioc);
+//   // Look up the domain name
+//   auto const results = resolver.resolve(host, std::to_string(port));
+//   // Make the connection on the IP address we get from a lookup
+//   stream.connect(results);
+//   // Set up an HTTP GET request message
+//   http::request<http::string_body> req{ http::verb::get, target, 11 };
+//   req.set(http::field::host, host);
+//   req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+//   // Send the HTTP request to the remote host
+//   //http::async_write();
+//   http::write(stream, req);
+//   // This buffer is used for reading and must be persisted
+//   beast::flat_buffer buffer;
+//   // Declare a container to hold the response
+//   http::response<http::dynamic_body> res;
+//   // Receive the HTTP response
+//   http::read(stream, buffer, res);
+//   // Gracefully close the socket
+//   beast::error_code ec;
+//   stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+//   // not_connected happens sometimes
+//   // so don't bother reporting it.
+//   //
+//   if (ec && ec != beast::errc::not_connected)
+//   {
+//     BOOST_LOG_TRIVIAL(error) << ec.value();
+//     return "";
+//   }
+//   std::string ret_str = boost::beast::buffers_to_string(res.body().data());
+// 
+//   return ret_str;
+
+  epee::net_utils::http::http_simple_client cli;
+  if (!cli.connect(host, port, timeout_global))
   {
-    BOOST_LOG_TRIVIAL(error) << ec.value();
+    BOOST_LOG_TRIVIAL(error) << "Failed to connect to " << host << ":" << port;
     return "";
   }
-  std::string ret_str = boost::beast::buffers_to_string(res.body().data());
+  const epee::net_utils::http::http_response_info* resp_ptr = nullptr;
+  if (!cli.invoke_get(target, std::string(), &resp_ptr))
+  {
+    BOOST_LOG_TRIVIAL(error) << "Failed to invoke to " << host << ":" << port << "  " << target;
+    return "";
+  }
 
-  return ret_str;
+  if (!resp_ptr)
+  {
+    BOOST_LOG_TRIVIAL(error) << "Failed to invoke to " << host << ":" << port << "  " << target;
+    return "";
+  }
+
+  return resp_ptr->m_body;
 }
 string TorLib::GetDataFromUrlAsync(const string host, const int port, const string target)
 {
-  BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrlAsync " << host << ":" << port << " target=" << target;
-  net::io_context ioc;
-  shared_ptr<HTTPClient> client = make_shared<HTTPClient>(ioc);
-  client->RunClient(host.c_str(), port, target, timeout_global);
-  ioc.run();
-  return client->GetData();
+  epee::net_utils::http::http_simple_client cli;
+  if (!cli.connect(host, port, timeout_global))
+  {
+    BOOST_LOG_TRIVIAL(error) << "Failed to connect to " << host << ":" << port;
+    return "";
+  }
+  const epee::net_utils::http::http_response_info* resp_ptr = nullptr;
+  if (!cli.invoke_get(target, std::string(), &resp_ptr))
+  {
+    BOOST_LOG_TRIVIAL(error) << "Failed to invoke to " << host << ":" << port << "  " << target;
+    return "";
+  }
+
+  if (!resp_ptr)
+  {
+    BOOST_LOG_TRIVIAL(error) << "Failed to invoke to " << host << ":" << port << "  " << target;
+    return "";
+  }
+
+  return resp_ptr->m_body;
+  //BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrlAsync " << host << ":" << port << " target=" << target;
+  //net::io_context ioc;
+  //shared_ptr<HTTPClient> client = make_shared<HTTPClient>(ioc);
+  //client->RunClient(host.c_str(), port, target, timeout_global);
+  //ioc.run();
+  //return client->GetData();
 }
