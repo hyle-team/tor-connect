@@ -2,10 +2,9 @@
 
 project("tor-connect")
 
-#set(BOOST_ROOT "D:\\boost_1_72_0") # either set it here or from the command line  
 SET(Boost_USE_STATIC_LIBS ON)           # link statically
 
-include_directories(epee/include)
+include_directories(${EPEE_INCLUDE_PATH_FOR_SUBMODULES})
 
 if(MSVC)
   add_definitions("/D_CRT_SECURE_NO_WARNINGS /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN")
