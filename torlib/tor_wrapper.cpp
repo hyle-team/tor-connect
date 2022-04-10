@@ -38,7 +38,7 @@ namespace tools
   namespace tor
   {
 
-    tor_transport::tor_transport() :m_is_connected(false), m_is_initialized(false), m_recev_timeout(0)
+    tor_transport::tor_transport() :m_is_connected(false), m_recev_timeout(0)
     {
       
     }
@@ -56,18 +56,13 @@ namespace tools
       {
         m_ptransport.reset(new TorLib());
       }
+      if (!m_ptransport->Init(boost::log::trivial::warning))
+      {
+        return false;
+      }
       m_ptransport->SetNotifier(m_pn);
 
       m_recev_timeout = recev_timeout;
-
-      if (!m_is_initialized)
-      {
-        if (!m_ptransport->Init(boost::log::trivial::warning))
-        {
-          return false;
-        }
-        m_is_initialized = true;
-      }
 
       int res = m_ptransport->Connect(ip, port, timeout);
       if (res == 0)

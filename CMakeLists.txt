@@ -12,6 +12,9 @@ if(MSVC)
 endif()
 
 
+add_definitions("/DHTTP_ENABLE_GZIP")
+
+
 file(GLOB_RECURSE TOR_LIB_FILES torlib/*.cpp torlib/*.h)    
 
 add_library(tor-connect "tor-connect.cpp" "tor-connect.h" ${TOR_LIB_FILES} )
