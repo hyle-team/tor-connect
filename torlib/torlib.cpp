@@ -321,7 +321,7 @@ bool TorLib::ConnectToNode(int n_node, int search_port)
     //ctx.load_verify_file("torlib/cacert.pem");
 
     operation_completed = false;
-    net_connect = make_unique<NetConnect>(io_service, ctx);
+    net_connect = std::unique_ptr<NetConnect>(new NetConnect(io_service, ctx));
     onion_routers[n_node] = parser.GetOnionRouter(data_consensus, true, 443, 0, "", { "Fast","Running", "Valid" });
 
     if (onion_routers[n_node]->nickname.length() == 0)

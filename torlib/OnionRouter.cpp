@@ -44,7 +44,7 @@ OnionRouter::OnionRouter() {
 
 string OnionRouter::GetBase16EncodedIdentity(string identity_key) {    
     int encoded_len = identity_key.length() * 2 + 1;
-    unique_ptr<char[]> encoded = make_unique<char[]>(encoded_len);
+    unique_ptr<char[]> encoded = std::unique_ptr<char[]>(new char[encoded_len]);
     Util::Base16Encode(encoded.get(), encoded_len, identity_key.c_str(), identity_key.length());
     string ret(encoded.get());
     return ret;

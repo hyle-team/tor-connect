@@ -18,7 +18,7 @@ file(GLOB_RECURSE TOR_LIB_FILES torlib/*.cpp torlib/*.h)
 
 add_library(tor-connect "tor-connect.cpp" "tor-connect.h" ${TOR_LIB_FILES} )
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+#target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 find_package(Boost 1.55 COMPONENTS log regex REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Boost_INCLUDE_DIRS}) 
