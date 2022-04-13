@@ -43,7 +43,7 @@ OnionRouter::OnionRouter() {
 }
 
 string OnionRouter::GetBase16EncodedIdentity(string identity_key) {    
-    int encoded_len = identity_key.length() * 2 + 1;
+    size_t encoded_len = identity_key.length() * 2 + 1;
     unique_ptr<char[]> encoded = std::unique_ptr<char[]>(new char[encoded_len]);
     Util::Base16Encode(encoded.get(), encoded_len, identity_key.c_str(), identity_key.length());
     string ret(encoded.get());
@@ -53,7 +53,7 @@ string OnionRouter::GetBase16EncodedIdentity(string identity_key) {
 RSA* OnionRouter::GetKey(string str_key) {
     if (str_key.length() == 0) return NULL;
     RSA* key = RSA_new();
-    BIO* publicKeyBio = BIO_new_mem_buf(str_key.c_str(), str_key.length());
+    BIO* publicKeyBio = BIO_new_mem_buf(str_key.c_str(), static_cast<int>(str_key.length()));
     if (publicKeyBio == NULL) return NULL;
     key = PEM_read_bio_RSAPublicKey(publicKeyBio, &key, NULL, NULL);
     if (key == NULL) return NULL;
@@ -105,7 +105,7 @@ u8* OnionRouter::GetPublicKey()
     return pair_key.first.data();
 }
 
-int OnionRouter::GetPublicKeySize()
+size_t OnionRouter::GetPublicKeySize()
 {
     return pair_key.first.size();
 }
@@ -193,7 +193,7 @@ bool OnionRouter::GeneratKeyMaterialUnc(unc* handshake_data, unc* other_public_k
             message.push_back(i);
             result = nullptr;
             resultlen = -1;
-            result_block = HMAC(EVP_sha256(), pseudo_random_key.data(), pseudo_random_key.size(), message.data(), message.size(), result, &resultlen);
+            result_block = HMAC(EVP_sha256(), pseudo_random_key.data(), static_cast<int>(pseudo_random_key.size()), message.data(), message.size(), result, &resultlen);
             bytes_processed = min(static_cast<size_t>(resultlen), bytes_remaining);
             copy(result_block, result_block + bytes_processed, back_inserter(key_material));
             bytes_remaining -= bytes_processed;
@@ -260,7 +260,7 @@ void OnionRouter::AesEncrypt(Cell& cell, AES_KEY* key, unc* iv, unc* ec, uni* nu
 {
     unsigned char buf[CELL_SIZE];
     unc* cell_payload = cell.GetPayload();
-    int cell_payload_size = cell.GetPayloadSize();
+    size_t cell_payload_size = cell.GetPayloadSize();
 
     BOOST_LOG_TRIVIAL(debug) << "-------------Befor AesEncrypt-------------";
     Util::HexDump(cell_payload, cell_payload_size);
@@ -277,7 +277,7 @@ void OnionRouter::AesEncrypt(Cell& cell, AES_KEY* key, unc* iv, unc* ec, uni* nu
 void OnionRouter::CalculateDigest(SHA_CTX* digest, RelayCell& cell, unc* result)
 {
     unc* cell_payload = cell.GetPayload();
-    int cell_payload_size = cell.GetPayloadSize();
+    size_t cell_payload_size = cell.GetPayloadSize();
 
     SHA1_Update(digest, cell_payload, cell_payload_size);
     SHA_CTX temp;

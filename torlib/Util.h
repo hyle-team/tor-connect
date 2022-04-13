@@ -149,7 +149,7 @@ private:
   static void Int16ToArrayBigEndian(unc*a, u16 i);
   static uint16_t BigEndianArrayToShort(unc*buf);
   static uint32_t BigEndianArrayToInt(unc*buf);
-  static void HexDump(unc* buf, int length);
+  static void HexDump(unc* buf, size_t length);
   static void Base16Encode(char *dest, size_t destlen, const char *src, size_t srclen);
   static uint16_t GetRandomId();
   static uint32_t GetRandom();  

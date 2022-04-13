@@ -71,7 +71,7 @@ RelayCell::RelayCell(Cell& cell) :Cell()
     copy(cell.GetBuffer(), cell.GetBuffer() + GetBufferSize(), GetBuffer());
 }
 
-void RelayCell::AppendData(u16 streamId, cell_command relay_command, int length) {
+void RelayCell::AppendData(u16 streamId, cell_command relay_command, size_t length) {
     Append(static_cast<unc>(relay_command));                // relay command                    1 byte
     Append(static_cast<u16>(0));                            // recognized                       2 bytes
     Append(streamId);                                       // steram id                        2 bytes
@@ -80,12 +80,14 @@ void RelayCell::AppendData(u16 streamId, cell_command relay_command, int length)
     // Total 11 bytes
 }
 
-bool RelayCell::SetLengthRelayPayload(u16 size_data) {
-    if(size_data>TOR_MAX_CELL_PAYLOAD_DATA)
+bool RelayCell::SetLengthRelayPayload(size_t size_data_arg) {
+    if(size_data_arg>TOR_MAX_CELL_PAYLOAD_DATA)
     {
         BOOST_LOG_TRIVIAL(error) << "The length of the data is longer than the maximum length of the cell";
         return false;
-    }        
+    }    
+
+    u16 size_data = static_cast<u16>(size_data_arg);
     unc len_payload[RELAY_BYTES_LEN];
     Util::Int16ToArrayBigEndian(len_payload, size_data);
     memcpy(GetBuffer() + RELAY_PAYLOAD_OFFSET, len_payload, RELAY_BYTES_LEN);

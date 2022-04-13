@@ -128,7 +128,7 @@ public:
 	bool SetServiceKey(string current_key);
 	void GeneratPairKeys();
 	u8* GetPublicKey();
-	int GetPublicKeySize();
+	size_t GetPublicKeySize();
 	bool GeneratKeyMaterial(shared_ptr<Cell> node);
 	bool GeneratKeyMaterial(RelayCell& node);
 	void SetKeyMaterial(unc* key_material);

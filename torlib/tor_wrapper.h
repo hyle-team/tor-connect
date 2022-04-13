@@ -48,7 +48,7 @@ namespace tools
       bool is_connected();
       bool send(const void* data, size_t sz);
       bool send(const std::string& buff);
-      bool recv_n(std::string& buff, int64_t sz);
+      bool recv_n(std::string& buff, size_t sz);
       bool disconnect();
       void set_notifier(tools::tor::t_transport_state_notifier* pn);
 

@@ -69,7 +69,7 @@ void Util::Int16ToArrayBigEndian(unc* a, u16 i) {
 	a[0] = (i >> 8) & 0xff;
 	a[1] = i & 0xff;
 }
-void Util::HexDump(unc* buffer, int length) {
+void Util::HexDump(unc* buffer, size_t length) {
 	stringstream str;
 	str.setf(std::ios_base::hex, std::ios::basefield);
 	str.fill('0');
@@ -120,7 +120,7 @@ bool Util::IsBase64(unsigned char c) {
 }
 
 string Util::Base64Decode(string const& encoded_string) {
-	int in_len = encoded_string.size();
+	size_t in_len = encoded_string.size();
 	int i = 0;
 	int j = 0;
 	int in_ = 0;

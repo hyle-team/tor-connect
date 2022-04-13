@@ -53,7 +53,7 @@ class RelayCell :
     public Cell
 {
 private:
-    void AppendData(u16 streamId, cell_command relay_command, int length);
+    void AppendData(u16 streamId, cell_command relay_command, size_t length);
 public:
     RelayCell(u32 circuitId, u16 streamId, cell_command command, cell_command relay_command);
     RelayCell(u16 streamId, cell_command command, cell_command relay_command);
@@ -67,7 +67,7 @@ public:
     int GetRelayPayloadLength();
     unc GetRelayType();
     bool IsRelayEnd();
-    bool SetLengthRelayPayload(u16 size_data);
+    bool SetLengthRelayPayload(size_t size_data);
     u16 GetStreamId();
 };
 

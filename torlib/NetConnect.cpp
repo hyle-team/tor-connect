@@ -266,7 +266,7 @@ void NetConnect::DummyFunc(const sys::error_code& error) {
 void NetConnect::WriteCell(Cell& cell, ConnectFunction connectFunc) {
 	BOOST_LOG_TRIVIAL(debug) << "NetConnect::WriteCell";
 	unc* buffer = cell.GetBuffer();
-	int len = cell.GetBufferSize();
+	size_t len = cell.GetBufferSize();
 	Util::HexDump(buffer, len);
 	net::async_write(socket, net::buffer(buffer, len),
 		boost::bind(&NetConnect::WriteCellComplete, this, connectFunc, pl::error));

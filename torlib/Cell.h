@@ -128,7 +128,7 @@ enum cell_command : uint8_t
 class Cell {
 protected:
 	unc buffer[CELL_SIZE];
-	int index;
+	size_t index;
 public:
 
 	Cell(u32 circuit_id, cell_command command);
@@ -138,17 +138,17 @@ public:
 	void Append(u32 val);
 	void Append(unc val);
 	void Append(string& val);
-	void Append(unc* segment, int length);
+	void Append(unc* segment, size_t length);
 
 	u32 ReadInt();
 	unc ReadByte();
 	string ReadString();
 
 	unc* GetBuffer();
-	int GetBufferSize();
+	size_t GetBufferSize();
 
 	unc* GetPayload();
-	int GetPayloadSize();
+	size_t GetPayloadSize();
 
 	unc GetCommand();
 	bool IsRelayCell();
@@ -158,7 +158,7 @@ public:
 	void SetCommand(u8 command);
 	void SetId(u32 circuit_id);
 	void SetPayloadSize(u16 payload_size);
-	int GetCurentIndex();
+  size_t GetCurentIndex();
 
 	virtual ~Cell() {}
 };

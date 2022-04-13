@@ -91,7 +91,7 @@ namespace tools
       return m_ptransport->Send(buff);
     }
 
-    bool tor_transport::recv_n(std::string& buff, int64_t sz)
+    bool tor_transport::recv_n(std::string& buff, size_t sz)
     {
       while (m_intermediate_buff.size() < sz)
       {
