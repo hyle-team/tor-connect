@@ -96,7 +96,7 @@ private:
       "Running",
       "Unnamed",
       "Valid",
-      "V2Dir",
+      "V2Dir"
     };
     const string directory_footer_control_words = "directory-footer";
     const string accept_ports = "accept";
