@@ -83,21 +83,6 @@ private:
 	const string preamble_control_words = "valid-until";
     
     map<control_words, string> list_control_words;    
-    const array<string, 13> status_flags = { 
-      "Authority",
-      "BadExit",
-      "Exit",
-      "Fast",
-      "Guard",
-      "HSDir",
-      "Named",
-      "NoEdConsensus",
-      "Stable",
-      "Running",
-      "Unnamed",
-      "Valid",
-      "V2Dir"
-    };
     const string directory_footer_control_words = "directory-footer";
     const string accept_ports = "accept";
     const string reject_ports = "reject";
