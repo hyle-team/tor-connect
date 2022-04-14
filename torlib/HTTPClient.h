@@ -37,6 +37,7 @@ class HTTPClient : public std::enable_shared_from_this<HTTPClient>
 {
     tcp::resolver resolver_;
     beast::tcp_stream stream_;
+    
     beast::flat_buffer buffer_; // (Must persist between reads)
     http::request<http::empty_body> req_;    
     int timeout_op = 0;

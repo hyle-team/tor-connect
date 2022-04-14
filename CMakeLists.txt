@@ -4,7 +4,6 @@ project("tor-connect")
 
 SET(Boost_USE_STATIC_LIBS ON)           # link statically
 
-include_directories(${EPEE_INCLUDE_PATH_FOR_SUBMODULES})
 
 if(MSVC)
   add_definitions("/D_CRT_SECURE_NO_WARNINGS /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN")
@@ -20,7 +19,7 @@ add_library(tor-connect "tor-connect.cpp" "tor-connect.h" ${TOR_LIB_FILES} )
 
 #target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
-find_package(Boost 1.55 COMPONENTS log regex REQUIRED)
+find_package(Boost 1.70 COMPONENTS log regex REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Boost_INCLUDE_DIRS}) 
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
