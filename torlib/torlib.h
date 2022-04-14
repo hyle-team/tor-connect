@@ -56,7 +56,7 @@ private:
 	vector<tuple<string, string, int, int>> DA;
 	Parser parser;
 	
-	string GetDataFromUrl(const string host, const int port, const string target);
+	//string GetDataFromUrl(const string host, const int port, const string target);
 	string GetDataFromUrlAsync(const string host, const int port, const string target);
 
 	net::io_service io_service;

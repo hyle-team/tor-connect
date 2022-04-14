@@ -35,8 +35,8 @@
 #include "torlib.h"
 #include "Curve25519.h"
 #include "RelayCell.h"
-//#include "HTTPClient.h"
-#include "net/http_client.h"
+#include "HTTPClient.h"
+//#include "net/http_client.h"
 
 bool TorLib::Init(log_lv log_level)
 {
@@ -579,7 +579,7 @@ bool TorLib::SendNodeInfo(ConnectFunction connectFunc)
   while (!operation_completed) io_service.poll_one();
   return !error_last_operation;
 }
-
+/*
 string TorLib::GetDataFromUrl(const string host, const int port, const string target)
 {
 //   BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrl " << host << ":" << port << " target=" << target;
@@ -641,9 +641,11 @@ string TorLib::GetDataFromUrl(const string host, const int port, const string ta
 
   return resp_ptr->m_body;
 }
+
+*/
 string TorLib::GetDataFromUrlAsync(const string host, const int port, const string target)
 {
-  epee::net_utils::http::http_simple_client cli;
+  /*epee::net_utils::http::http_simple_client cli;
   if (!cli.connect(host, port, timeout_global))
   {
     BOOST_LOG_TRIVIAL(error) << "Failed to connect to " << host << ":" << port;
@@ -663,10 +665,12 @@ string TorLib::GetDataFromUrlAsync(const string host, const int port, const stri
   }
 
   return resp_ptr->m_body;
-  //BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrlAsync " << host << ":" << port << " target=" << target;
-  //net::io_context ioc;
-  //shared_ptr<HTTPClient> client = make_shared<HTTPClient>(ioc);
-  //client->RunClient(host.c_str(), port, target, timeout_global);
-  //ioc.run();
-  //return client->GetData();
+  */
+
+  BOOST_LOG_TRIVIAL(debug) << "TorLib::GetDataFromUrlAsync " << host << ":" << port << " target=" << target;
+  net::io_context ioc;
+  shared_ptr<HTTPClient> client = make_shared<HTTPClient>(ioc);
+  client->RunClient(host.c_str(), port, target, timeout_global);
+  ioc.run();
+  return client->GetData();
 }
