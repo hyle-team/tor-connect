@@ -406,14 +406,14 @@ bool TorLib::GetConsensus()
   tuple<string, string, int, int> sv_one;
   int count_try = 0;
   data_consensus.clear();
-  //int rnd = Util::GetRandom() % DA.size();
-  int rnd = 0;
+  int rnd = Util::GetRandom() % DA.size();
+  //int rnd = 0;
   sv_one = DA[rnd];
   BOOST_LOG_TRIVIAL(debug) << "Connect to " << get<0>(sv_one) << ":" << get<3>(sv_one);
   data_result = GetDataFromUrlAsync(get<1>(sv_one), get<3>(sv_one), "/tor/status-vote/current/consensus");
   if (data_result.empty())
   {
-    BOOST_LOG_TRIVIAL(error) << "The file Consensus was not received!";
+    BOOST_LOG_TRIVIAL(error) << "The file Consensus was not received!("<< get<1>(sv_one) << ":" << get<3>(sv_one) << ")";
     return false;
   }
   data_consensus = parser.ParsString(data_result, "\n");
