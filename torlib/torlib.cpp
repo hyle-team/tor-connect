@@ -404,7 +404,6 @@ bool TorLib::GetConsensus()
 
   BOOST_LOG_TRIVIAL(info) << "Downloading consensus...";
   tuple<string, string, int, int> sv_one;
-  int count_try = 0;
   data_consensus.clear();
   int rnd = Util::GetRandom() % DA.size();
   //int rnd = 0;
@@ -563,7 +562,7 @@ bool TorLib::SendNodeInfo(ConnectFunction connectFunc)
   if (error_last_operation) return false;
 
   operation_completed = false;
-  unc loc_host[] = { 0xc0, 0xa8, 0x01, 0x01 }; // Nobody seems to care.
+  //unc loc_host[] = { 0xc0, 0xa8, 0x01, 0x01 }; // Nobody seems to care.
   long rem_host = net_connect->GetEndpointLong();
 
   Cell cell_Info(0, cell_command::netinfo);
