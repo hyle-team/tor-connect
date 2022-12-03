@@ -49,12 +49,14 @@ bool TorLib::Init(log_lv log_level)
   DA.push_back(make_tuple("gabelmoo", "131.188.40.189", 443, 80));
   DA.push_back(make_tuple("moria1", "128.31.0.39", 9101, 9131));
   DA.push_back(make_tuple("tor26", "86.59.21.38", 443, 80));
-  DA.push_back(make_tuple("dizum", "194.109.206.212", 443, 80));
-  DA.push_back(make_tuple("Tonga", "82.94.251.203", 443, 80));
+  DA.push_back(make_tuple("dizum", "45.66.33.45", 443, 80));
+  //DA.push_back(make_tuple("Tonga", "82.94.251.203", 443, 80));
   DA.push_back(make_tuple("dannenberg", "193.23.244.244", 443, 80));
   DA.push_back(make_tuple("maatuska", "171.25.193.9", 80, 443));
   DA.push_back(make_tuple("Faravahar", "154.35.175.225", 443, 80));
-  DA.push_back(make_tuple("longclaw", "199.254.238.52", 443, 80));
+  DA.push_back(make_tuple("longclaw", "199.58.81.140", 443, 80));
+  DA.push_back(make_tuple("bastet", "204.13.164.118", 443, 80));
+  DA.push_back(make_tuple("Serge", "66.111.2.131", 9001, 9030));
 
   circuit_id |= 0x80000000;
 
