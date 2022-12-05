@@ -62,7 +62,7 @@
   *
   * Field elements are written as an array of signed, 64-bit limbs, least
   * significant first. The value of the field element is:
-  *   x[0] + 2^26·x[1] + x^51·x[2] + 2^102·x[3] + ...
+  *   x[0] + 2^26*x[1] + x^51*x[2] + 2^102*x[3] + ...
   *
   * i.e. the limbs are 26, 25, 26, 25, ... bits wide. */
 
@@ -473,7 +473,7 @@ void Curve25519::fcontract(u8* output, limb* input_limbs) {
 
 	/* |input_limbs[i]| < 2^26, so it's valid to convert to an s32. */
 	for (i = 0; i < 10; i++) {
-		input[i] = input_limbs[i];
+		input[i] = static_cast<s32>(input_limbs[i]);
 	}
 
 	for (j = 0; j < 2; ++j) {
