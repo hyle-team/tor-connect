@@ -62,6 +62,7 @@
 #include <time.h>
 #include <sys/types.h>
 
+#define NOMINMAX // added for compartibility with OpenSSL 3.x as it includes windows.h without NOMINMAX and ruins compilation -- sowle
 #include <openssl/aes.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
